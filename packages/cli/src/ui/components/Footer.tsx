@@ -320,12 +320,16 @@ export const Footer: React.FC = () => {
         break;
       }
       case 'model-name': {
-        const str = getDisplayString(model);
+        // Show Ollama model name when using local provider
+        const displayModel =
+          authType === AuthType.OLLAMA
+            ? `🦙 ${process.env['OLLAMA_MODEL'] || 'ollama'}`
+            : getDisplayString(model);
         addCol(
           id,
           header,
-          () => <Text color={itemColor}>{str}</Text>,
-          str.length,
+          () => <Text color={itemColor}>{displayModel}</Text>,
+          displayModel.length,
         );
         break;
       }
@@ -345,7 +349,15 @@ export const Footer: React.FC = () => {
         break;
       }
       case 'quota': {
-        if (quotaStats?.remaining !== undefined && quotaStats.limit) {
+        // Hide quota for Ollama (local models have no quota)
+        if (authType === AuthType.OLLAMA) {
+          addCol(
+            id,
+            header,
+            () => <Text color={theme.status.success}>∞ local</Text>,
+            8,
+          );
+        } else if (quotaStats?.remaining !== undefined && quotaStats.limit) {
           addCol(
             id,
             header,

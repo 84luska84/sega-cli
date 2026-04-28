@@ -151,7 +151,7 @@ function convertContentsToMessages(
       sysText =
         systemInstruction.parts?.map((p) => p.text || '').join('\n') || '';
     } else if ('text' in systemInstruction) {
-      sysText = (systemInstruction).text || '';
+      sysText = systemInstruction.text || '';
     }
     if (sysText) {
       messages.push({ role: 'system', content: sysText });
@@ -347,7 +347,7 @@ export class OllamaContentGenerator implements ContentGenerator {
     _userPromptId: string,
     _role: LlmRole,
   ): Promise<GenerateContentResponse> {
-    const model = request.model || this.defaultModel;
+    const model = this.defaultModel; // Always use the configured Ollama model
     const messages = convertContentsToMessages(
       request.contents as Content[],
       request.config?.systemInstruction as
@@ -416,7 +416,7 @@ export class OllamaContentGenerator implements ContentGenerator {
     _userPromptId: string,
     _role: LlmRole,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
-    const model = request.model || this.defaultModel;
+    const model = this.defaultModel; // Always use the configured Ollama model
     const messages = convertContentsToMessages(
       request.contents as Content[],
       request.config?.systemInstruction as
