@@ -44,7 +44,12 @@ export function AuthDialog({
   const [exiting, setExiting] = useState(false);
   let items = [
     {
-      label: 'Sign in with Google',
+      label: 'Usar IAs Locais (Ollama)',
+      value: AuthType.OLLAMA,
+      key: AuthType.OLLAMA,
+    },
+    {
+      label: 'Entrar com o Google',
       value: AuthType.LOGIN_WITH_GOOGLE,
       key: AuthType.LOGIN_WITH_GOOGLE,
     },
@@ -66,12 +71,12 @@ export function AuthDialog({
           ]
         : []),
     {
-      label: 'Use Gemini API Key',
+      label: 'Usar Chave de API (Gemini)',
       value: AuthType.USE_GEMINI,
       key: AuthType.USE_GEMINI,
     },
     {
-      label: 'Vertex AI',
+      label: 'Usar Vertex AI',
       value: AuthType.USE_VERTEX_AI,
       key: AuthType.USE_VERTEX_AI,
     },
@@ -107,7 +112,7 @@ export function AuthDialog({
       return item.value === AuthType.USE_GEMINI;
     }
 
-    return item.value === AuthType.LOGIN_WITH_GOOGLE;
+    return item.value === AuthType.OLLAMA;
   });
   if (settings.merged.security.auth.enforcedType) {
     initialAuthIndex = 0;
@@ -194,7 +199,7 @@ export function AuthDialog({
         alignItems="flex-start"
       >
         <Text color={theme.text.primary}>
-          Logging in with Google... Restarting Gemini CLI to continue.
+          Redirecionando... Reiniciando o SEGA-CLI para continuar.
         </Text>
       </Box>
     );
@@ -212,11 +217,11 @@ export function AuthDialog({
       <Text color={theme.text.accent}>? </Text>
       <Box flexDirection="column" flexGrow={1}>
         <Text bold color={theme.text.primary}>
-          Get started
+          Iniciando
         </Text>
         <Box marginTop={1}>
           <Text color={theme.text.primary}>
-            How would you like to authenticate for this project?
+            Como você gostaria de autenticar neste projeto?
           </Text>
         </Box>
         <Box marginTop={1}>
@@ -235,11 +240,11 @@ export function AuthDialog({
           </Box>
         )}
         <Box marginTop={1}>
-          <Text color={theme.text.secondary}>(Use Enter to select)</Text>
+          <Text color={theme.text.secondary}>(Use Enter para selecionar)</Text>
         </Box>
         <Box marginTop={1}>
           <Text color={theme.text.primary}>
-            Terms of Services and Privacy Notice for Gemini CLI
+            Termos de Serviço e Privacidade (SEGA-CLI / Gemini)
           </Text>
         </Box>
         <Box marginTop={1}>

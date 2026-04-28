@@ -95,8 +95,7 @@ export function getAuthTypeFromEnv(): AuthType | undefined {
   ) {
     return AuthType.COMPUTE_ADC;
   }
-  // SEGA-CLI: Always default to Ollama instead of prompting for Google OAuth
-  return AuthType.OLLAMA;
+  return undefined;
 }
 
 export type ContentGeneratorConfig = {
@@ -221,11 +220,7 @@ export async function createContentGenerator(
 
     // ─── Ollama Local Provider ──────────────────────────────────────
     if (config.authType === AuthType.OLLAMA) {
-      const configured = gcConfig.getModel();
-      const isLegacyAuto = configured === 'auto-gemini-2.5';
-      const ollamaModel = !isLegacyAuto
-        ? configured
-        : process.env['OLLAMA_MODEL'] || 'qwen2.5:latest';
+      const ollamaModel = process.env['OLLAMA_MODEL'] || 'qwen2.5:latest';
       const ollamaBaseUrl =
         process.env['OLLAMA_BASE_URL'] || 'http://localhost:11434';
       const ollamaGenerator = new OllamaContentGenerator(

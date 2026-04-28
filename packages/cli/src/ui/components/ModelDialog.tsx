@@ -27,7 +27,6 @@ import {
   AuthType,
   PREVIEW_GEMINI_3_1_CUSTOM_TOOLS_MODEL,
   isProModel,
-  listOllamaModels,
 } from '@google/gemini-cli-core';
 import { useKeypress } from '../hooks/useKeypress.js';
 import { theme } from '../semantic-colors.js';
@@ -50,19 +49,6 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     config?.getProModelNoAccessSync() ? 'manual' : 'main',
   );
   const [persistMode, setPersistMode] = useState(false);
-  const [ollamaModels, setOllamaModels] = useState<Array<{ name: string; size: number }>>([]);
-
-  const selectedAuthType = settings.merged.security.auth.selectedType;
-
-  useEffect(() => {
-    if (selectedAuthType === AuthType.OLLAMA) {
-      listOllamaModels(process.env['OLLAMA_BASE_URL'] || 'http://localhost:11434')
-        .then((models) => {
-          if (models) setOllamaModels(models);
-        })
-        .catch(() => {});
-    }
-  }, [selectedAuthType]);
 
   useEffect(() => {
     async function checkAccess() {
@@ -83,6 +69,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   const useGemini31 = config?.getGemini31LaunchedSync?.() ?? false;
   const useGemini31FlashLite =
     config?.getGemini31FlashLiteLaunchedSync?.() ?? false;
+  const selectedAuthType = settings.merged.security.auth.selectedType;
   const useCustomToolModel =
     useGemini31 && selectedAuthType === AuthType.USE_GEMINI;
 
@@ -136,18 +123,6 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
   );
 
   const mainOptions = useMemo(() => {
-    // --- OLLAMA PATH ---
-    if (selectedAuthType === AuthType.OLLAMA) {
-      if (ollamaModels.length === 0) {
-        return [{ value: preferredModel, title: 'Carregando modelos Ollama...', key: 'loading' }];
-      }
-      return ollamaModels.map((m) => ({
-        value: m.name,
-        title: `🦙 ${m.name} (${(m.size / 1e9).toFixed(1)} GB)`,
-        key: m.name,
-      }));
-    }
-
     // --- DYNAMIC PATH ---
     if (
       config?.getExperimentalDynamicModelConfiguration?.() === true &&
@@ -177,7 +152,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         title: manualModelSelected
           ? `Manual (${getDisplayString(manualModelSelected, config ?? undefined)})`
           : 'Manual',
-        description: 'Selecionar modelo manualmente',
+        description: 'Manually select a model',
         key: 'Manual',
       });
       return list;
@@ -189,7 +164,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         value: DEFAULT_GEMINI_MODEL_AUTO,
         title: getDisplayString(DEFAULT_GEMINI_MODEL_AUTO),
         description:
-          'Deixe o SEGA decidir o melhor modelo: gemini-2.5-pro, gemini-2.5-flash',
+          'Let Gemini CLI decide the best model for the task: gemini-2.5-pro, gemini-2.5-flash',
         key: DEFAULT_GEMINI_MODEL_AUTO,
       },
       {
@@ -197,7 +172,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         title: manualModelSelected
           ? `Manual (${getDisplayString(manualModelSelected)})`
           : 'Manual',
-        description: 'Selecionar modelo manualmente',
+        description: 'Manually select a model',
         key: 'Manual',
       },
     ];
@@ -207,8 +182,8 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         value: PREVIEW_GEMINI_MODEL_AUTO,
         title: getDisplayString(PREVIEW_GEMINI_MODEL_AUTO),
         description: useGemini31
-          ? 'Deixe o SEGA decidir o melhor modelo: gemini-3.1-pro, gemini-3-flash'
-          : 'Deixe o SEGA decidir o melhor modelo: gemini-3-pro, gemini-3-flash',
+          ? 'Let Gemini CLI decide the best model for the task: gemini-3.1-pro, gemini-3-flash'
+          : 'Let Gemini CLI decide the best model for the task: gemini-3-pro, gemini-3-flash',
         key: PREVIEW_GEMINI_MODEL_AUTO,
       });
     }
@@ -219,11 +194,8 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
     manualModelSelected,
     useGemini31,
     useGemini31FlashLite,
-    hasAccessToProModel,
     useCustomToolModel,
-    ollamaModels,
-    preferredModel,
-    selectedAuthType,
+    hasAccessToProModel,
   ]);
 
   const manualOptions = useMemo(() => {
@@ -376,7 +348,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       padding={1}
       width="100%"
     >
-      <Text bold>Selecionar Modelo</Text>
+      <Text bold>Select Model</Text>
 
       <Box marginTop={1}>
         <DescriptiveRadioButtonSelect
@@ -389,17 +361,17 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
       <Box marginTop={1} flexDirection="column">
         <Box>
           <Text bold color={theme.text.primary}>
-            Lembrar modelo para sessões futuras:{' '}
+            Remember model for future sessions:{' '}
           </Text>
           <Text color={theme.status.success}>
-            {persistMode ? 'sim' : 'não'}
+            {persistMode ? 'true' : 'false'}
           </Text>
-          <Text color={theme.text.secondary}> (Pressione Tab para alternar)</Text>
+          <Text color={theme.text.secondary}> (Press Tab to toggle)</Text>
         </Box>
       </Box>
       <Box flexDirection="column">
         <Text color={theme.text.secondary}>
-          {'> Para forçar um modelo na inicialização, use a flag --model.'}
+          {'> To use a specific Gemini model on startup, use the --model flag.'}
         </Text>
       </Box>
       <ModelQuotaDisplay
@@ -407,7 +379,7 @@ export function ModelDialog({ onClose }: ModelDialogProps): React.JSX.Element {
         availableWidth={terminalWidth - 2}
       />
       <Box marginTop={1} flexDirection="column">
-        <Text color={theme.text.secondary}>(Pressione Esc para fechar)</Text>
+        <Text color={theme.text.secondary}>(Press Esc to close)</Text>
       </Box>
     </Box>
   );
