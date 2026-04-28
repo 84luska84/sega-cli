@@ -43,7 +43,7 @@ async function listTools(
 
 const listSubCommand: SlashCommand = {
   name: 'list',
-  description: 'List available Gemini CLI tools.',
+  description: 'List available SEGA-CLI tools.',
   kind: CommandKind.BUILT_IN,
   autoExecute: true,
   action: async (context: CommandContext): Promise<void> =>

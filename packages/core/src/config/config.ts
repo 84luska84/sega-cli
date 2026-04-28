@@ -1581,6 +1581,12 @@ export class Config implements McpContext, AgentLoopContext {
     // Only assign to instance properties after successful initialization
     this.contentGeneratorConfig = newContentGeneratorConfig;
 
+    // ─── Ollama: skip Google-specific services ───
+    if (authMethod === AuthType.OLLAMA) {
+      this.baseLlmClient = new BaseLlmClient(this.contentGenerator, this);
+      return;
+    }
+
     const codeAssistServer = getCodeAssistServer(this);
     const quotaPromise = codeAssistServer?.projectId
       ? this.refreshUserQuota()

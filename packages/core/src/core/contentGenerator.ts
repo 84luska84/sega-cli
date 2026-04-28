@@ -28,6 +28,7 @@ import { determineSurface } from '../utils/surface.js';
 import { RecordingContentGenerator } from './recordingContentGenerator.js';
 import { getVersion, resolveModel } from '../../index.js';
 import type { LlmRole } from '../telemetry/llmRole.js';
+import { OllamaContentGenerator } from './ollamaContentGenerator.js';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -63,6 +64,7 @@ export enum AuthType {
   LEGACY_CLOUD_SHELL = 'cloud-shell',
   COMPUTE_ADC = 'compute-default-credentials',
   GATEWAY = 'gateway',
+  OLLAMA = 'ollama-local',
 }
 
 /**
@@ -74,6 +76,10 @@ export enum AuthType {
  * 3. GEMINI_API_KEY -> USE_GEMINI
  */
 export function getAuthTypeFromEnv(): AuthType | undefined {
+  // Ollama takes highest priority - if OLLAMA_MODEL is set, use local provider
+  if (process.env['OLLAMA_MODEL']) {
+    return AuthType.OLLAMA;
+  }
   if (process.env['GOOGLE_GENAI_USE_GCA'] === 'true') {
     return AuthType.LOGIN_WITH_GOOGLE;
   }
@@ -188,6 +194,14 @@ export async function createContentGeneratorConfig(
     return contentGeneratorConfig;
   }
 
+  // Ollama local provider - no API key needed
+  if (authType === AuthType.OLLAMA) {
+    contentGeneratorConfig.baseUrl =
+      process.env['OLLAMA_BASE_URL'] || 'http://localhost:11434';
+    contentGeneratorConfig.vertexai = false;
+    return contentGeneratorConfig;
+  }
+
   return contentGeneratorConfig;
 }
 
@@ -202,6 +216,18 @@ export async function createContentGenerator(
         gcConfig.fakeResponses,
       );
       return new LoggingContentGenerator(fakeGenerator, gcConfig);
+    }
+
+    // ─── Ollama Local Provider ──────────────────────────────────────
+    if (config.authType === AuthType.OLLAMA) {
+      const ollamaModel = process.env['OLLAMA_MODEL'] || 'qwen2.5:latest';
+      const ollamaBaseUrl =
+        process.env['OLLAMA_BASE_URL'] || 'http://localhost:11434';
+      const ollamaGenerator = new OllamaContentGenerator(
+        ollamaBaseUrl,
+        ollamaModel,
+      );
+      return new LoggingContentGenerator(ollamaGenerator, gcConfig);
     }
     const version = await getVersion();
     const model = resolveModel(

@@ -91,6 +91,21 @@ export const useAuthCommand = (
         return;
       }
 
+      // ─── Ollama bypass: skip Google auth entirely ───
+      if (process.env['OLLAMA_MODEL']) {
+        try {
+          await config.refreshAuth(AuthType.OLLAMA);
+          debugLogger.log(
+            `Authenticated via Ollama (model: ${process.env['OLLAMA_MODEL']}).`,
+          );
+          setAuthError(null);
+          setAuthState(AuthState.Authenticated);
+        } catch (e) {
+          onAuthError(`Failed to connect to Ollama: ${getErrorMessage(e)}`);
+        }
+        return;
+      }
+
       const authType = settings.merged.security.auth.selectedType;
       if (!authType) {
         if (process.env['GEMINI_API_KEY']) {
