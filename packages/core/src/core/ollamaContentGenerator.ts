@@ -348,9 +348,24 @@ export class OllamaContentGenerator implements ContentGenerator {
     _role: LlmRole,
   ): Promise<GenerateContentResponse> {
     const model = this.defaultModel; // Always use the configured Ollama model
+    // SEGA-CLI Persona Injection to force local models to use native tools
+    const segaPersona = `Você é o SEGA-CLI, um agente de terminal autônomo e assistente de programação. Você tem acesso a ferramentas no sistema do usuário. IMPORTANTE: Para interagir com o sistema (criar arquivos, executar comandos, buscar código), você DEVE usar a API de 'tool_calls' (Function Calling) nativa do modelo. NUNCA imprima blocos JSON com chamadas de ferramenta no texto da sua resposta. Sempre chame a função nativamente.`;
+    
+    let rawSysInstruct = request.config?.systemInstruction;
+    let finalSysInstruct = rawSysInstruct;
+    if (!finalSysInstruct) {
+      finalSysInstruct = { text: segaPersona };
+    } else if (typeof finalSysInstruct === 'string') {
+      finalSysInstruct = segaPersona + '\n\n' + finalSysInstruct;
+    } else if (Array.isArray(finalSysInstruct)) {
+      finalSysInstruct = [{ text: segaPersona + '\n\n' }, ...finalSysInstruct];
+    } else if ('text' in finalSysInstruct) {
+      finalSysInstruct = { ...finalSysInstruct, text: segaPersona + '\n\n' + finalSysInstruct.text };
+    }
+
     const messages = convertContentsToMessages(
       request.contents as Content[],
-      request.config?.systemInstruction as
+      finalSysInstruct as
         | string
         | Part
         | Part[]
@@ -417,9 +432,24 @@ export class OllamaContentGenerator implements ContentGenerator {
     _role: LlmRole,
   ): Promise<AsyncGenerator<GenerateContentResponse>> {
     const model = this.defaultModel; // Always use the configured Ollama model
+    // SEGA-CLI Persona Injection to force local models to use native tools
+    const segaPersona = `Você é o SEGA-CLI, um agente de terminal autônomo e assistente de programação. Você tem acesso a ferramentas no sistema do usuário. IMPORTANTE: Para interagir com o sistema (criar arquivos, executar comandos, buscar código), você DEVE usar a API de 'tool_calls' (Function Calling) nativa do modelo. NUNCA imprima blocos JSON com chamadas de ferramenta no texto da sua resposta. Sempre chame a função nativamente.`;
+    
+    let rawSysInstruct = request.config?.systemInstruction;
+    let finalSysInstruct = rawSysInstruct;
+    if (!finalSysInstruct) {
+      finalSysInstruct = { text: segaPersona };
+    } else if (typeof finalSysInstruct === 'string') {
+      finalSysInstruct = segaPersona + '\n\n' + finalSysInstruct;
+    } else if (Array.isArray(finalSysInstruct)) {
+      finalSysInstruct = [{ text: segaPersona + '\n\n' }, ...finalSysInstruct];
+    } else if ('text' in finalSysInstruct) {
+      finalSysInstruct = { ...finalSysInstruct, text: segaPersona + '\n\n' + finalSysInstruct.text };
+    }
+
     const messages = convertContentsToMessages(
       request.contents as Content[],
-      request.config?.systemInstruction as
+      finalSysInstruct as
         | string
         | Part
         | Part[]

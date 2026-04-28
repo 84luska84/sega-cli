@@ -220,7 +220,9 @@ export async function createContentGenerator(
 
     // ─── Ollama Local Provider ──────────────────────────────────────
     if (config.authType === AuthType.OLLAMA) {
-      const ollamaModel = process.env['OLLAMA_MODEL'] || 'qwen2.5:latest';
+      const configured = gcConfig.getModel();
+      const isLegacyAuto = configured === 'auto-gemini-2.5';
+      const ollamaModel = !isLegacyAuto ? configured : (process.env['OLLAMA_MODEL'] || 'qwen2.5:latest');
       const ollamaBaseUrl =
         process.env['OLLAMA_BASE_URL'] || 'http://localhost:11434';
       const ollamaGenerator = new OllamaContentGenerator(

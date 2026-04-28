@@ -127,8 +127,8 @@ vi.mock('../tools/read-many-files');
 vi.mock('../tools/memoryTool', () => ({
   MemoryTool: vi.fn(),
   setGeminiMdFilename: vi.fn(),
-  getCurrentGeminiMdFilename: vi.fn(() => 'GEMINI.md'), // Mock the original filename
-  DEFAULT_CONTEXT_FILENAME: 'GEMINI.md',
+  getCurrentGeminiMdFilename: vi.fn(() => 'SEGA.md'), // Mock the original filename
+  DEFAULT_CONTEXT_FILENAME: 'SEGA.md',
   GEMINI_DIR: '.gemini',
 }));
 
@@ -3435,7 +3435,7 @@ describe('Config JIT Initialization', () => {
         .fn()
         .mockReturnValue('Environment Memory\n\nMCP Instructions'),
       getUserProjectMemory: vi.fn().mockReturnValue(''),
-      getLoadedPaths: vi.fn().mockReturnValue(new Set(['/path/to/GEMINI.md'])),
+      getLoadedPaths: vi.fn().mockReturnValue(new Set(['/path/to/SEGA.md'])),
     } as unknown as MemoryContextManager;
     (MemoryContextManager as unknown as Mock).mockImplementation(
       () => mockMemoryContextManager,
@@ -3482,7 +3482,7 @@ describe('Config JIT Initialization', () => {
 
     // Verify state update (delegated to MemoryContextManager)
     expect(config.getGeminiMdFileCount()).toBe(1);
-    expect(config.getGeminiMdFilePaths()).toEqual(['/path/to/GEMINI.md']);
+    expect(config.getGeminiMdFilePaths()).toEqual(['/path/to/SEGA.md']);
   });
 
   it('should NOT initialize MemoryContextManager when experimentalJitContext is disabled', async () => {
@@ -3548,7 +3548,7 @@ describe('Config JIT Initialization', () => {
     it('should NOT add the global ~/.gemini directory to the workspace when enabled', async () => {
       // The prompt-driven memoryV2 mode does not broaden the workspace
       // to include the global ~/.gemini/ directory. Cross-project personal
-      // preferences are routed to ~/.gemini/GEMINI.md via the surgical
+      // preferences are routed to ~/.gemini/SEGA.md via the surgical
       // isPathAllowed allowlist instead — see the next two tests.
       const params: ConfigParameters = {
         sessionId: 'test-session',
@@ -3566,9 +3566,9 @@ describe('Config JIT Initialization', () => {
       expect(directories).not.toContain(Storage.getGlobalGeminiDir());
     });
 
-    it('should allow isPathAllowed to write the global ~/.gemini/GEMINI.md file', async () => {
+    it('should allow isPathAllowed to write the global ~/.gemini/SEGA.md file', async () => {
       // Surgical allowlist: when memoryV2 is on, the prompt routes
-      // cross-project personal preferences to ~/.gemini/GEMINI.md, so the
+      // cross-project personal preferences to ~/.gemini/SEGA.md, so the
       // agent must be able to edit that exact file via edit/write_file.
       const params: ConfigParameters = {
         sessionId: 'test-session',
@@ -3584,13 +3584,13 @@ describe('Config JIT Initialization', () => {
 
       const globalGeminiMdPath = path.join(
         Storage.getGlobalGeminiDir(),
-        'GEMINI.md',
+        'SEGA.md',
       );
       expect(config.isPathAllowed(globalGeminiMdPath)).toBe(true);
     });
 
     it('should NOT allow isPathAllowed to write other files under ~/.gemini/ (least privilege)', async () => {
-      // The allowlist is surgical: only ~/.gemini/GEMINI.md is reachable.
+      // The allowlist is surgical: only ~/.gemini/SEGA.md is reachable.
       // settings.json, keybindings.json, credentials, etc. remain disallowed.
       const params: ConfigParameters = {
         sessionId: 'test-session',

@@ -204,7 +204,7 @@ export const InputPrompt: React.FC<InputPromptProps> = ({
   config,
   slashCommands,
   commandContext,
-  placeholder = '  Type your message or @path/to/file',
+  placeholder = '  Digite sua mensagem ou @caminho/do/arquivo',
   focus = true,
   setShellModeActive,
   approvalMode,

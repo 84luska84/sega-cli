@@ -82,6 +82,32 @@ export class ModelRouterService {
     ]);
     const classifierThreshold = String(thresholdValue);
 
+    // Bypass routing for Ollama local models
+    if (this.config.getContentGeneratorConfig()?.authType === 'ollama-local') {
+      const decision: RoutingDecision = {
+        model: this.config.getModel(),
+        metadata: {
+          source: 'ollama-bypass',
+          latencyMs: 0,
+          reasoning: 'Routing bypassed for local models.'
+        }
+      };
+      
+      const event = new ModelRoutingEvent(
+        decision.model,
+        decision.metadata.source,
+        decision.metadata.latencyMs,
+        decision.metadata.reasoning,
+        false,
+        undefined,
+        this.config.getApprovalMode(),
+        enableNumericalRouting,
+        classifierThreshold,
+      );
+      logModelRouting(this.config, event);
+      return decision;
+    }
+
     let failed = false;
     let error_message: string | undefined;
 

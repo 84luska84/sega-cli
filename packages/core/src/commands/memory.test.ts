@@ -177,7 +177,7 @@ describe('memory commands', () => {
 
   describe('listMemoryFiles', () => {
     it('should list the memory files in use', () => {
-      const filePaths = ['/path/to/GEMINI.md', '/other/path/GEMINI.md'];
+      const filePaths = ['/path/to/SEGA.md', '/other/path/SEGA.md'];
       vi.mocked(mockConfig.getGeminiMdFilePaths).mockReturnValue(filePaths);
 
       const result = listMemoryFiles(mockConfig);
@@ -186,7 +186,7 @@ describe('memory commands', () => {
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
         expect(result.content).toContain(
-          'There are 2 GEMINI.md file(s) in use:',
+          'There are 2 SEGA.md file(s) in use:',
         );
         expect(result.content).toContain(filePaths.join('\n'));
       }
@@ -200,7 +200,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toBe('No GEMINI.md files in use.');
+        expect(result.content).toBe('No SEGA.md files in use.');
       }
     });
 
@@ -214,7 +214,7 @@ describe('memory commands', () => {
       expect(result.type).toBe('message');
       if (result.type === 'message') {
         expect(result.messageType).toBe('info');
-        expect(result.content).toBe('No GEMINI.md files in use.');
+        expect(result.content).toBe('No SEGA.md files in use.');
       }
     });
   });

@@ -1,44 +1,44 @@
 # SEGA-CLI ⚡
 
-**Um agente AI terminal-first alimentado por modelos locais do Ollama.**
+**Um agente AI terminal-first e assistente de programação alimentado por modelos locais do Ollama.**
 
 Fork do [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli)
-(Apache 2.0), modificado para utilizar exclusivamente modelos locais via
-[Ollama](https://ollama.ai).
+(Apache 2.0), totalmente modificado e localizado para o Português do Brasil (PT-BR) para operar de forma 100% autônoma e local usando a sua infraestrutura do [Ollama](https://ollama.ai).
 
 ---
 
 ## 🚀 O que é?
 
-SEGA-CLI é um clone funcional do Gemini CLI do Google, mas em vez de depender da
-API do Google Gemini, ele roda 100% local usando qualquer modelo do Ollama
-instalado no seu computador.
+SEGA-CLI é um agente avançado de terminal que clona as funcionalidades do Gemini CLI do Google, mas em vez de enviar seus códigos e arquiteturas para a API na nuvem, ele atua 100% offline utilizando IAs open-source do seu próprio computador. Ele pode criar arquivos, ler código e rodar comandos diretamente.
 
 ### Diferenças do Original
 
-| Feature      | Gemini CLI (Original)    | SEGA-CLI (Este Fork)   |
-| ------------ | ------------------------ | ---------------------- |
-| Motor AI     | Google Gemini API        | Ollama (Local)         |
-| Autenticação | Google OAuth / API Key   | Nenhuma (local)        |
-| Privacidade  | Dados enviados ao Google | 100% offline           |
-| Custo        | Quota limitada / pago    | Gratuito               |
-| Modelos      | Gemini Pro/Flash         | Qualquer modelo Ollama |
+| Feature                | Gemini CLI (Original)    | SEGA-CLI (Este Fork)             |
+| ---------------------- | ------------------------ | -------------------------------- |
+| Motor AI               | Google Gemini API        | Ollama (Local)                   |
+| Autenticação           | Google OAuth / API Key   | Nenhuma (100% Offline)           |
+| Privacidade            | Dados enviados ao Google | Máxima Privacidade               |
+| Idioma da Interface    | Inglês                   | Português (PT-BR)                |
+| Modelos Suportados     | Gemini Pro/Flash         | Qwen, Mistral, Llama, DeepSeek   |
+| Modo de Operação       | Chatbot de Nuvem         | Agente Autônomo com Tools        |
 
 ---
 
 ## 📋 Pré-requisitos
 
 1. **Node.js** ≥ 20.0.0
-2. **Ollama** instalado e rodando ([ollama.ai](https://ollama.ai))
-3. Pelo menos um modelo baixado no Ollama:
+2. **Ollama** instalado e rodando em background ([ollama.com](https://ollama.com))
+3. Pelo menos um modelo com suporte a ferramentas (tool calling) baixado no Ollama:
    ```bash
    ollama pull qwen2.5:latest
-   # ou qualquer outro modelo
+   ollama pull devstral-small-2:latest
    ```
 
 ---
 
-## 🔧 Instalação
+## 🔧 Instalação Global
+
+Para acessar o SEGA-CLI de qualquer diretório da sua máquina de forma simples, instale o projeto globalmente:
 
 ```bash
 # Clonar o repositório
@@ -48,57 +48,46 @@ cd sega-cli
 # Instalar dependências
 npm install
 
-# Buildar
+# Buildar o código-fonte
 npm run build
+
+# Linkar o comando globalmente
+npm link
 ```
 
 ---
 
-## ⚡ Uso
+## ⚡ Uso Básico
 
-### Modo Básico
-
-```bash
-# Definir o modelo Ollama e iniciar
-OLLAMA_MODEL=qwen2.5:latest npm run start
-```
-
-### Variáveis de Ambiente
-
-| Variável          | Descrição                                     | Padrão                   |
-| ----------------- | --------------------------------------------- | ------------------------ |
-| `OLLAMA_MODEL`    | **Obrigatória.** Nome do modelo Ollama a usar | -                        |
-| `OLLAMA_BASE_URL` | URL base do servidor Ollama                   | `http://localhost:11434` |
-
-### Exemplos com Diferentes Modelos
+Após instalar via `npm link`, basta abrir o seu terminal em **qualquer pasta** de projeto e digitar:
 
 ```bash
-# Qwen 2.5 (leve, 7B)
-OLLAMA_MODEL=qwen2.5:latest npm run start
-
-# Qwen 3 (8B, com tool calling)
-OLLAMA_MODEL=qwen3:8b npm run start
-
-# DeepSeek Coder (code-focused)
-OLLAMA_MODEL=huihui_ai/qwen2.5-coder-abliterate:14b npm run start
-
-# Devstral (24B, Mistral para code)
-OLLAMA_MODEL=devstral-small-2:latest npm run start
+sega
 ```
 
-### Listar Modelos Disponíveis
+A interface interativa do terminal será iniciada.
+
+### Seletor Dinâmico de IA
+
+Dentro do aplicativo, você **não precisa mais lidar com variáveis de ambiente**. Para alterar qual Inteligência Artificial está escrevendo e editando seus códigos, simplesmente digite:
 
 ```bash
-curl http://localhost:11434/api/tags | python3 -m json.tool
+/model
 ```
+O SEGA-CLI consultará automaticamente a sua API do Ollama e exibirá uma lista interativa com todos os modelos que você tem baixado e os respectivos tamanhos em Gigabytes para você escolher.
+
+### Exemplo de Comandos no Chat
+
+- `> crie um arquivo main.py com um script de hello world`
+- `> explique o que a função X do meu arquivo atual faz`
+- `> /memory show` (para ver o contexto do projeto carregado via `SEGA.md`)
+- `> /stats model` (para ver os tempos de resposta e métricas da IA local)
 
 ---
 
-## 🛠️ Como Funciona
+## 🛠️ Como Funciona (Arquitetura)
 
-O SEGA-CLI intercepta as chamadas que o Gemini CLI faria à API do Google e as
-redireciona para o endpoint OpenAI-compatible do Ollama
-(`/v1/chat/completions`).
+O SEGA-CLI intercepta as requisições que o framework faria para o ecossistema do Google, bloqueia camadas de telemetria indesejadas, e redireciona os payloads convertidos para o endpoint OpenAI-compatible do Ollama (`/v1/chat/completions`).
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌─────────────┐
@@ -107,45 +96,25 @@ redireciona para o endpoint OpenAI-compatible do Ollama
 └─────────────┘     └──────────────┘     └─────────────┘
 ```
 
-### Arquivos Modificados
-
-Os seguintes arquivos foram alterados em relação ao projeto original:
-
-- `packages/core/src/core/ollamaContentGenerator.ts` — **[NOVO]** Gerador de
-  conteúdo para Ollama
-- `packages/core/src/core/contentGenerator.ts` — Adicionado `AuthType.OLLAMA` e
-  factory
-- `packages/core/src/config/config.ts` — Bypass de serviços Google para Ollama
-- `packages/cli/src/ui/auth/useAuth.ts` — Bypass de autenticação Google
-- `package.json` — Rebranding para SEGA-CLI
-- `README.md` — Esta documentação
-- `NOTICE` — Atribuição ao projeto original
+### Injeção de Persona e Correção de Tool Calling
+Modelos abertos menores tendem a imprimir códigos estruturados de ferramentas (ex: `write_file`) em JSON puro na resposta se não forem guiados perfeitamente. O SEGA-CLI implementa um **bypass avançado de prompt de sistema** que garante que qualquer modelo de código do Ollama reconheça o uso de interface nativa de *Function Calling*, permitindo a manipulação de arquivos transparente sem poluir o console.
 
 ---
 
 ## ⚠️ Limitações Conhecidas
 
-1. **Tool Calling**: Depende do suporte do modelo. Modelos como `qwen2.5-coder`,
-   `qwen3`, `mistral` suportam. Modelos menores podem falhar.
-2. **Embeddings**: Não suportado (usado apenas para busca de contexto avançada).
-3. **Performance**: Depende do hardware local (GPU recomendada).
-4. **Tamanho de Contexto**: Limitado ao contexto do modelo local (tipicamente
-   4K-128K tokens).
+1. **Tool Calling**: Requer suporte avançado no modelo do Ollama. Recomenda-se IAs modernas focadas em código como `qwen2.5-coder`, `qwen3`, `mistral`, `llama3`. Modelos inferiores a 7B podem não ter contexto de ferramentas suficiente.
+2. **Contexto**: Totalmente atrelado ao poder da sua GPU/CPU e ao tamanho de janela do modelo selecionado.
 
 ---
 
 ## 📜 Licença
 
-Este projeto é distribuído sob a licença **Apache 2.0**, mantendo a mesma
-licença do projeto original.
-
-Consulte o arquivo [LICENSE](LICENSE) para detalhes completos e o arquivo
-[NOTICE](NOTICE) para atribuições.
+Este projeto é distribuído sob a licença **Apache 2.0**, mantendo a mesma licença do projeto original.
+Consulte o arquivo [LICENSE](LICENSE) para detalhes completos e o arquivo [NOTICE](NOTICE) para atribuições.
 
 ---
 
 ## 🙏 Atribuição
 
-Este projeto é um fork de
-[google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli),
-copyright 2025 Google LLC, licenciado sob Apache 2.0.
+Este projeto é um fork de [google-gemini/gemini-cli](https://github.com/google-gemini/gemini-cli), copyright 2025 Google LLC, licenciado sob Apache 2.0.

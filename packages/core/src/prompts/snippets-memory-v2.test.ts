@@ -22,14 +22,14 @@ describe('renderOperationalGuidelines - memoryV2Enabled', () => {
     expect(result).not.toContain('Instruction and Memory Files');
   });
 
-  it('should distinguish shared GEMINI.md instructions from private MEMORY.md when memoryV2Enabled is true', () => {
+  it('should distinguish shared SEGA.md instructions from private MEMORY.md when memoryV2Enabled is true', () => {
     const result = renderOperationalGuidelines({
       ...baseOptions,
       memoryV2Enabled: true,
     });
     expect(result).toContain('Instruction and Memory Files');
-    expect(result).toContain('GEMINI.md');
-    expect(result).toContain('./GEMINI.md');
+    expect(result).toContain('SEGA.md');
+    expect(result).toContain('./SEGA.md');
     expect(result).toContain('MEMORY.md');
     expect(result).toContain('sibling `*.md` file');
     expect(result).toContain('There is no `save_memory` tool');
@@ -52,7 +52,7 @@ describe('renderOperationalGuidelines - memoryV2Enabled', () => {
     expect(result).toContain('Never duplicate or mirror the same fact');
 
     // MEMORY.md must be scoped to its sibling notes only and must never
-    // point at GEMINI.md topics.
+    // point at SEGA.md topics.
     expect(result).toContain('index for its sibling `*.md` notes');
     expect(result).toContain('never use it to point at');
   });
@@ -89,7 +89,7 @@ describe('renderOperationalGuidelines - memoryV2Enabled', () => {
   });
 
   it('should include the Global Personal Memory bullet, cross-project routing rule, and four-tier mutual-exclusion when globalMemoryPath is provided', () => {
-    const globalMemoryPath = '/Users/test/.gemini/GEMINI.md';
+    const globalMemoryPath = '/Users/test/.gemini/SEGA.md';
     const result = renderOperationalGuidelines({
       ...baseOptions,
       memoryV2Enabled: true,

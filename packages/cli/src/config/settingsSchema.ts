@@ -633,7 +633,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description:
-          'Hide the context summary (GEMINI.md, MCP servers) above the input.',
+          'Hide the context summary (SEGA.md, MCP servers) above the input.',
         showInDialog: true,
       },
       footer: {
@@ -1412,7 +1412,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: ['.git'] as string[],
         description:
-          'File or directory names that mark the boundary for GEMINI.md discovery. ' +
+          'File or directory names that mark the boundary for SEGA.md discovery. ' +
           'The upward traversal stops at the first directory containing any of these markers. ' +
           'An empty array disables parent traversal.',
         showInDialog: false,
@@ -1439,7 +1439,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: false,
         default: false,
         description: oneLine`
-          Controls how /memory reload loads GEMINI.md files.
+          Controls how /memory reload loads SEGA.md files.
           When true, include directories are scanned; when false, only the current directory is used.
         `,
         showInDialog: true,
@@ -2245,7 +2245,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Enable Just-In-Time (JIT) context loading. Defaults to true; set to false to opt out and load all GEMINI.md files into the system instruction up-front.',
+          'Enable Just-In-Time (JIT) context loading. Defaults to true; set to false to opt out and load all SEGA.md files into the system instruction up-front.',
         showInDialog: false,
       },
       useOSC52Paste: {
@@ -2385,7 +2385,7 @@ const SETTINGS_SCHEMA = {
         requiresRestart: true,
         default: true,
         description:
-          'Disable the built-in save_memory tool and let the main agent persist project context by editing markdown files directly with edit/write_file. Route facts across four tiers: team-shared conventions go to project GEMINI.md files, project-specific personal notes go to the per-project private memory folder (MEMORY.md as index + sibling .md files for detail), and cross-project personal preferences go to the global ~/.gemini/GEMINI.md (the only file under ~/.gemini/ that the agent can edit — settings, credentials, etc. remain off-limits). Set to false to fall back to the legacy save_memory tool.',
+          'Disable the built-in save_memory tool and let the main agent persist project context by editing markdown files directly with edit/write_file. Route facts across four tiers: team-shared conventions go to project SEGA.md files, project-specific personal notes go to the per-project private memory folder (MEMORY.md as index + sibling .md files for detail), and cross-project personal preferences go to the global ~/.gemini/SEGA.md (the only file under ~/.gemini/ that the agent can edit — settings, credentials, etc. remain off-limits). Set to false to fall back to the legacy save_memory tool.',
         showInDialog: true,
       },
       stressTestProfile: {

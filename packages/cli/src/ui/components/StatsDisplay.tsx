@@ -139,10 +139,10 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
   return (
     <Box flexDirection="column" marginTop={1}>
       <Text bold color={theme.text.primary}>
-        Model Usage
+        Uso do Modelo
       </Text>
       <Text color={theme.text.secondary}>
-        Use /model to view model quota information
+        Use /model para ver as informações de cota do modelo
       </Text>
       <Box height={1} />
 
@@ -157,7 +157,7 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
       >
         <Box width={nameWidth}>
           <Text bold color={theme.text.secondary}>
-            Model
+            Modelo
           </Text>
         </Box>
         <Box width={requestsWidth} justifyContent="flex-end">
@@ -167,17 +167,17 @@ const ModelUsageTable: React.FC<ModelUsageTableProps> = ({ models }) => {
         </Box>
         <Box width={inputTokensWidth} justifyContent="flex-end">
           <Text bold color={theme.text.secondary}>
-            Input Tokens
+            Tokens Entrada
           </Text>
         </Box>
         <Box width={cacheReadsWidth} justifyContent="flex-end">
           <Text bold color={theme.text.secondary}>
-            Cache Reads
+            Lidos (Cache)
           </Text>
         </Box>
         <Box width={outputTokensWidth} justifyContent="flex-end">
           <Text bold color={theme.text.secondary}>
-            Output Tokens
+            Tokens Saída
           </Text>
         </Box>
       </Box>
@@ -276,7 +276,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
     }
     return (
       <Text bold color={theme.text.accent}>
-        Session Stats
+        Estatísticas da Sessão
       </Text>
     );
   };
@@ -300,17 +300,17 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
       {renderTitle()}
       <Box height={1} />
 
-      <Section title="Interaction Summary">
-        <StatRow title="Session ID:">
+      <Section title="Resumo da Interação">
+        <StatRow title="ID da Sessão:">
           <Text color={theme.text.primary}>{stats.sessionId}</Text>
         </StatRow>
         {showUserIdentity && selectedAuthType && (
-          <StatRow title="Auth Method:">
+          <StatRow title="Autenticação:">
             <Text color={theme.text.primary}>
               {selectedAuthType.startsWith('oauth')
                 ? userEmail
-                  ? `Signed in with Google (${userEmail})`
-                  : 'Signed in with Google'
+                  ? `Conectado com Google (${userEmail})`
+                  : 'Conectado com Google'
                 : selectedAuthType}
             </Text>
           </StatRow>
@@ -321,7 +321,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
           </StatRow>
         )}
         {showUserIdentity && creditBalance != null && creditBalance >= 0 && (
-          <StatRow title="Google AI Credits:">
+          <StatRow title="Créditos Google AI:">
             <Text
               color={
                 creditBalance > 0 ? theme.text.primary : theme.text.secondary
@@ -331,29 +331,29 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
             </Text>
           </StatRow>
         )}
-        <StatRow title="Tool Calls:">
+        <StatRow title="Ferramentas (Tool Calls):">
           <Text color={theme.text.primary}>
             {tools.totalCalls} ({' '}
             <Text color={theme.status.success}>✓ {tools.totalSuccess}</Text>{' '}
             <Text color={theme.status.error}>x {tools.totalFail}</Text> )
           </Text>
         </StatRow>
-        <StatRow title="Success Rate:">
+        <StatRow title="Taxa de Sucesso:">
           <Text color={successColor}>{computed.successRate.toFixed(1)}%</Text>
         </StatRow>
         {computed.totalDecisions > 0 && (
-          <StatRow title="User Agreement:">
+          <StatRow title="Aprovação de Usuário:">
             <Text color={agreementColor}>
               {computed.agreementRate.toFixed(1)}%{' '}
               <Text color={theme.text.secondary}>
-                ({computed.totalDecisions} reviewed)
+                ({computed.totalDecisions} revisados)
               </Text>
             </Text>
           </StatRow>
         )}
         {files &&
           (files.totalLinesAdded > 0 || files.totalLinesRemoved > 0) && (
-            <StatRow title="Code Changes:">
+            <StatRow title="Modificações de Código:">
               <Text color={theme.text.primary}>
                 <Text color={theme.status.success}>
                   +{files.totalLinesAdded}
@@ -367,15 +367,15 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
       </Section>
 
       <Section title="Performance">
-        <StatRow title="Wall Time:">
+        <StatRow title="Tempo Total:">
           <Text color={theme.text.primary}>{duration}</Text>
         </StatRow>
-        <StatRow title="Agent Active:">
+        <StatRow title="Agente Ativo:">
           <Text color={theme.text.primary}>
             {formatDuration(computed.agentActiveTime)}
           </Text>
         </StatRow>
-        <SubStatRow title="API Time:">
+        <SubStatRow title="Tempo de API:">
           <Text color={theme.text.primary}>
             {formatDuration(computed.totalApiTime)}{' '}
             <Text color={theme.text.secondary}>
@@ -383,7 +383,7 @@ export const StatsDisplay: React.FC<StatsDisplayProps> = ({
             </Text>
           </Text>
         </SubStatRow>
-        <SubStatRow title="Tool Time:">
+        <SubStatRow title="Tempo em Ferramentas:">
           <Text color={theme.text.primary}>
             {formatDuration(computed.totalToolTime)}{' '}
             <Text color={theme.text.secondary}>

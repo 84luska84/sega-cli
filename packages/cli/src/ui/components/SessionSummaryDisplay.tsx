@@ -24,19 +24,20 @@ export const SessionSummaryDisplay: React.FC<SessionSummaryDisplayProps> = ({
   const worktreeSettings = config.getWorktreeSettings();
 
   const escapedSessionId = escapeShellArg(stats.sessionId, shell);
-  let footer = `To resume this session: gemini --resume ${escapedSessionId}`;
+  let footer = `Para retomar esta sessão: sega --resume ${escapedSessionId}`;
 
   if (worktreeSettings) {
     footer =
-      `To resume work in this worktree: cd ${escapeShellArg(worktreeSettings.path, shell)} && gemini --resume ${escapedSessionId}\n` +
-      `To remove manually: git worktree remove ${escapeShellArg(worktreeSettings.path, shell)}`;
+      `Para retomar o trabalho neste worktree: cd ${escapeShellArg(worktreeSettings.path, shell)} && sega --resume ${escapedSessionId}\n` +
+      `Para remover manualmente: git worktree remove ${escapeShellArg(worktreeSettings.path, shell)}`;
   }
 
   return (
     <StatsDisplay
-      title="Agent powering down. Goodbye!"
+      title="Desligando o agente. Até logo!"
       duration={duration}
       footer={footer}
     />
   );
 };
+

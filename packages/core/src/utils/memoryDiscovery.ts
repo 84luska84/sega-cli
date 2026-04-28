@@ -503,7 +503,7 @@ export async function getUserProjectMemoryPaths(
     );
     return [preferredMemoryPath];
   } catch {
-    // Fall back to the legacy private GEMINI.md file if the project has not
+    // Fall back to the legacy private SEGA.md file if the project has not
     // been migrated to MEMORY.md yet.
   }
 
@@ -594,7 +594,7 @@ export function categorizeAndConcatenate(
 }
 
 /**
- * Traverses upward from startDir to stopDir, finding all GEMINI.md variants.
+ * Traverses upward from startDir to stopDir, finding all SEGA.md variants.
  *
  * Files are ordered by directory level (root to leaf), with all filename
  * variants grouped together per directory.
@@ -654,7 +654,7 @@ export interface LoadServerHierarchicalMemoryResponse {
 }
 
 /**
- * Loads hierarchical GEMINI.md files and concatenates their content.
+ * Loads hierarchical SEGA.md files and concatenates their content.
  * This function is intended for use by the server.
  */
 export async function loadServerHierarchicalMemory(
@@ -714,7 +714,7 @@ export async function loadServerHierarchicalMemory(
 
   if (allFilePathsStringDeduped.length === 0) {
     debugLogger.debug(
-      '[DEBUG] [MemoryDiscovery] No GEMINI.md files found in hierarchy of the workspace.',
+      '[DEBUG] [MemoryDiscovery] No SEGA.md files found in hierarchy of the workspace.',
     );
     return {
       memoryContent: { global: '', extension: '', project: '' },
@@ -730,7 +730,7 @@ export async function loadServerHierarchicalMemory(
 
   if (allFilePaths.length === 0) {
     debugLogger.debug(
-      '[DEBUG] [MemoryDiscovery] No unique GEMINI.md files found after deduplication by file identity.',
+      '[DEBUG] [MemoryDiscovery] No unique SEGA.md files found after deduplication by file identity.',
     );
     return {
       memoryContent: { global: '', extension: '', project: '' },
@@ -842,7 +842,7 @@ export async function loadJitSubdirectoryMemory(
   // Resolve the target to a directory before traversing upward.
   // When the target is a file (e.g. /app/src/file.ts), start from its
   // parent directory to avoid a wasted fs.access check on a nonsensical
-  // path like /app/src/file.ts/GEMINI.md.
+  // path like /app/src/file.ts/SEGA.md.
   let startDir = resolvedTarget;
   try {
     const stat = await fs.stat(resolvedTarget);

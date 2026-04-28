@@ -544,7 +544,7 @@ My code memory
 
   it('should load extension context file paths', async () => {
     const extensionFilePath = await createTestFile(
-      path.join(testRootDir, 'extensions/ext1/GEMINI.md'),
+      path.join(testRootDir, 'extensions/ext1/SEGA.md'),
       'Extension memory content',
     );
 
@@ -603,7 +603,7 @@ included directory memory
   });
 
   it('should handle multiple directories and files in parallel correctly', async () => {
-    // Create multiple test directories with GEMINI.md files
+    // Create multiple test directories with SEGA.md files
     const numDirs = 5;
     const createdFiles: string[] = [];
 
@@ -705,7 +705,7 @@ included directory memory
   describe('getExtensionMemoryPaths', () => {
     it('should return active extension context files', async () => {
       const extFile = await createTestFile(
-        path.join(testRootDir, 'ext', 'GEMINI.md'),
+        path.join(testRootDir, 'ext', 'SEGA.md'),
         'Extension content',
       );
       const loader = new SimpleExtensionLoader([
@@ -723,7 +723,7 @@ included directory memory
 
     it('should ignore inactive extensions', async () => {
       const extFile = await createTestFile(
-        path.join(testRootDir, 'ext', 'GEMINI.md'),
+        path.join(testRootDir, 'ext', 'SEGA.md'),
         'Extension content',
       );
       const loader = new SimpleExtensionLoader([
@@ -784,11 +784,11 @@ included directory memory
       );
 
       // No .git, so ceiling falls back to the trusted root itself.
-      // notesDir has no GEMINI.md and won't traverse up to docsDir.
+      // notesDir has no SEGA.md and won't traverse up to docsDir.
       const resultNotes = await getEnvironmentMemoryPaths([notesDir]);
       expect(resultNotes).toHaveLength(0);
 
-      // docsDir has a GEMINI.md at the trusted root itself, so it's found.
+      // docsDir has a SEGA.md at the trusted root itself, so it's found.
       const resultDocs = await getEnvironmentMemoryPaths([docsDir]);
       expect(resultDocs).toHaveLength(1);
       expect(resultDocs[0]).toBe(docsFile);
@@ -870,12 +870,12 @@ included directory memory
   describe('case-insensitive filesystem deduplication', () => {
     it('should deduplicate files that point to the same inode (same physical file)', async () => {
       const geminiFile = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'sega.md'),
         'Project root memory',
       );
 
       // create hard link to simulate case-insensitive filesystem behavior
-      const geminiFileLink = path.join(projectRoot, 'GEMINI.md');
+      const geminiFileLink = path.join(projectRoot, 'SEGA.md');
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
@@ -896,7 +896,7 @@ included directory memory
       expect(stats1.ino).toBe(stats2.ino);
       expect(stats1.dev).toBe(stats2.dev);
 
-      setGeminiMdFilename(['GEMINI.md', 'gemini.md']);
+      setGeminiMdFilename(['SEGA.md', 'sega.md']);
 
       const result = flattenResult(
         await loadServerHierarchicalMemory(
@@ -923,11 +923,11 @@ included directory memory
 
     it('should handle case where files have different inodes (different files)', async () => {
       const geminiFileLower = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'sega.md'),
         'Lowercase file content',
       );
       const geminiFileUpper = await createTestFile(
-        path.join(projectRoot, 'GEMINI.md'),
+        path.join(projectRoot, 'SEGA.md'),
         'Uppercase file content',
       );
 
@@ -935,7 +935,7 @@ included directory memory
       const stats2 = await fsPromises.lstat(geminiFileUpper);
 
       if (stats1.ino !== stats2.ino || stats1.dev !== stats2.dev) {
-        setGeminiMdFilename(['GEMINI.md', 'gemini.md']);
+        setGeminiMdFilename(['SEGA.md', 'sega.md']);
 
         const result = flattenResult(
           await loadServerHierarchicalMemory(
@@ -956,11 +956,11 @@ included directory memory
 
     it("should handle files that cannot be stat'd (missing files)", async () => {
       await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'sega.md'),
         'Valid file content',
       );
 
-      setGeminiMdFilename(['gemini.md', 'missing.md']);
+      setGeminiMdFilename(['sega.md', 'missing.md']);
 
       const result = flattenResult(
         await loadServerHierarchicalMemory(
@@ -978,11 +978,11 @@ included directory memory
 
     it('should deduplicate multiple paths pointing to same file (3+ duplicates)', async () => {
       const geminiFile = await createTestFile(
-        path.join(projectRoot, 'gemini.md'),
+        path.join(projectRoot, 'sega.md'),
         'Project root memory',
       );
 
-      const link1 = path.join(projectRoot, 'GEMINI.md');
+      const link1 = path.join(projectRoot, 'SEGA.md');
       const link2 = path.join(projectRoot, 'Gemini.md');
 
       try {
@@ -1007,7 +1007,7 @@ included directory memory
       expect(stats1.ino).toBe(stats2.ino);
       expect(stats1.ino).toBe(stats3.ino);
 
-      setGeminiMdFilename(['gemini.md', 'GEMINI.md', 'Gemini.md']);
+      setGeminiMdFilename(['sega.md', 'SEGA.md', 'Gemini.md']);
 
       const result = flattenResult(
         await loadServerHierarchicalMemory(
@@ -1116,11 +1116,11 @@ included directory memory
       const targetFile = path.join(subDir, 'target.txt');
 
       const geminiFile = await createTestFile(
-        path.join(subDir, 'gemini.md'),
+        path.join(subDir, 'sega.md'),
         'JIT memory content',
       );
 
-      const geminiFileLink = path.join(subDir, 'GEMINI.md');
+      const geminiFileLink = path.join(subDir, 'SEGA.md');
       try {
         await fsPromises.link(geminiFile, geminiFileLink);
       } catch (error) {
@@ -1140,7 +1140,7 @@ included directory memory
       const stats2 = await fsPromises.lstat(geminiFileLink);
       expect(stats1.ino).toBe(stats2.ino);
 
-      setGeminiMdFilename(['gemini.md', 'GEMINI.md']);
+      setGeminiMdFilename(['sega.md', 'SEGA.md']);
 
       const result = await loadJitSubdirectoryMemory(
         targetFile,
@@ -1213,7 +1213,7 @@ included directory memory
         new Set(),
       );
 
-      // Should find the GEMINI.md in the same directory as the file
+      // Should find the SEGA.md in the same directory as the file
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
       expect(result.files[0].content).toBe('Src context rules');
@@ -1264,7 +1264,7 @@ included directory memory
         new Set(),
       );
 
-      // subDir is within the trusted root, so its GEMINI.md is found
+      // subDir is within the trusted root, so its SEGA.md is found
       expect(result.files).toHaveLength(1);
       expect(result.files[0].path).toBe(subDirMemory);
       expect(result.files[0].content).toBe('Content without git');

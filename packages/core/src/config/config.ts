@@ -2819,7 +2819,7 @@ export class Config implements McpContext, AgentLoopContext {
 
   /**
    * Updates the system instruction with the latest user memory.
-   * Whenever the user memory (GEMINI.md files) is updated.
+   * Whenever the user memory (SEGA.md files) is updated.
    */
   updateSystemInstructionIfInitialized(): void {
     const geminiClient = this.geminiClient;
@@ -3063,7 +3063,7 @@ export class Config implements McpContext, AgentLoopContext {
   /**
    * Checks if a given absolute path is allowed for file system operations.
    * A path is allowed if it's within the workspace context, the project's
-   * temporary directory, or is exactly the global personal `~/.gemini/GEMINI.md`
+   * temporary directory, or is exactly the global personal `~/.gemini/SEGA.md`
    * file (the latter is the only file under `~/.gemini/` that is reachable —
    * settings, credentials, keybindings, etc. remain disallowed).
    *
@@ -3084,7 +3084,7 @@ export class Config implements McpContext, AgentLoopContext {
       return true;
     }
 
-    // Surgical allowlist: the global personal GEMINI.md file (and ONLY that
+    // Surgical allowlist: the global personal SEGA.md file (and ONLY that
     // file) is reachable so the prompt-driven memory flow can persist
     // cross-project personal preferences. This deliberately does NOT
     // allowlist the rest of `~/.gemini/`.

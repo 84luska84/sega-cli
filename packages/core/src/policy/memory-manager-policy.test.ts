@@ -26,10 +26,10 @@ describe('Memory Manager Policy', () => {
     });
   });
 
-  it('should allow save_memory to read ~/.gemini/GEMINI.md', async () => {
+  it('should allow save_memory to read ~/.gemini/SEGA.md', async () => {
     const toolCall = {
       name: 'read_file',
-      args: { file_path: '~/.gemini/GEMINI.md' },
+      args: { file_path: '~/.gemini/SEGA.md' },
     };
     const result = await engine.check(
       toolCall,
@@ -40,10 +40,10 @@ describe('Memory Manager Policy', () => {
     expect(result.decision).toBe(PolicyDecision.ALLOW);
   });
 
-  it('should allow save_memory to write ~/.gemini/GEMINI.md', async () => {
+  it('should allow save_memory to write ~/.gemini/SEGA.md', async () => {
     const toolCall = {
       name: 'write_file',
-      args: { file_path: '~/.gemini/GEMINI.md', content: 'test' },
+      args: { file_path: '~/.gemini/SEGA.md', content: 'test' },
     };
     const result = await engine.check(
       toolCall,
@@ -104,7 +104,7 @@ describe('Memory Manager Policy', () => {
   it('should fall through to global allow rule for other agents accessing ~/.gemini/', async () => {
     const toolCall = {
       name: 'read_file',
-      args: { file_path: '~/.gemini/GEMINI.md' },
+      args: { file_path: '~/.gemini/SEGA.md' },
     };
     const result = await engine.check(
       toolCall,
