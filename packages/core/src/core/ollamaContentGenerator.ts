@@ -350,8 +350,8 @@ export class OllamaContentGenerator implements ContentGenerator {
     const model = this.defaultModel; // Always use the configured Ollama model
     // SEGA-CLI Persona Injection to force local models to use native tools
     const segaPersona = `Você é o SEGA-CLI, um agente de terminal autônomo e assistente de programação. Você tem acesso a ferramentas no sistema do usuário. IMPORTANTE: Para interagir com o sistema (criar arquivos, executar comandos, buscar código), você DEVE usar a API de 'tool_calls' (Function Calling) nativa do modelo. NUNCA imprima blocos JSON com chamadas de ferramenta no texto da sua resposta. Sempre chame a função nativamente.`;
-    
-    let rawSysInstruct = request.config?.systemInstruction;
+
+    const rawSysInstruct = request.config?.systemInstruction;
     let finalSysInstruct = rawSysInstruct;
     if (!finalSysInstruct) {
       finalSysInstruct = { text: segaPersona };
@@ -360,17 +360,15 @@ export class OllamaContentGenerator implements ContentGenerator {
     } else if (Array.isArray(finalSysInstruct)) {
       finalSysInstruct = [{ text: segaPersona + '\n\n' }, ...finalSysInstruct];
     } else if ('text' in finalSysInstruct) {
-      finalSysInstruct = { ...finalSysInstruct, text: segaPersona + '\n\n' + finalSysInstruct.text };
+      finalSysInstruct = {
+        ...finalSysInstruct,
+        text: segaPersona + '\n\n' + finalSysInstruct.text,
+      };
     }
 
     const messages = convertContentsToMessages(
       request.contents as Content[],
-      finalSysInstruct as
-        | string
-        | Part
-        | Part[]
-        | Content
-        | undefined,
+      finalSysInstruct as string | Part | Part[] | Content | undefined,
     );
     const tools = convertToolsToOllama(
       request.config?.tools as Array<{
@@ -434,8 +432,8 @@ export class OllamaContentGenerator implements ContentGenerator {
     const model = this.defaultModel; // Always use the configured Ollama model
     // SEGA-CLI Persona Injection to force local models to use native tools
     const segaPersona = `Você é o SEGA-CLI, um agente de terminal autônomo e assistente de programação. Você tem acesso a ferramentas no sistema do usuário. IMPORTANTE: Para interagir com o sistema (criar arquivos, executar comandos, buscar código), você DEVE usar a API de 'tool_calls' (Function Calling) nativa do modelo. NUNCA imprima blocos JSON com chamadas de ferramenta no texto da sua resposta. Sempre chame a função nativamente.`;
-    
-    let rawSysInstruct = request.config?.systemInstruction;
+
+    const rawSysInstruct = request.config?.systemInstruction;
     let finalSysInstruct = rawSysInstruct;
     if (!finalSysInstruct) {
       finalSysInstruct = { text: segaPersona };
@@ -444,17 +442,15 @@ export class OllamaContentGenerator implements ContentGenerator {
     } else if (Array.isArray(finalSysInstruct)) {
       finalSysInstruct = [{ text: segaPersona + '\n\n' }, ...finalSysInstruct];
     } else if ('text' in finalSysInstruct) {
-      finalSysInstruct = { ...finalSysInstruct, text: segaPersona + '\n\n' + finalSysInstruct.text };
+      finalSysInstruct = {
+        ...finalSysInstruct,
+        text: segaPersona + '\n\n' + finalSysInstruct.text,
+      };
     }
 
     const messages = convertContentsToMessages(
       request.contents as Content[],
-      finalSysInstruct as
-        | string
-        | Part
-        | Part[]
-        | Content
-        | undefined,
+      finalSysInstruct as string | Part | Part[] | Content | undefined,
     );
     const tools = convertToolsToOllama(
       request.config?.tools as Array<{
@@ -599,31 +595,89 @@ export class OllamaContentGenerator implements ContentGenerator {
             // Regular text content
             if (choice.delta.content) {
               lastTextContent += choice.delta.content;
-              const parts: Part[] = [{ text: choice.delta.content }];
-              const finishReason =
-                choice.finish_reason === 'stop' ? 'STOP' : undefined;
+              yield {
+                candidates: [
+                  {
+                    content: {
+                      role: 'model',
+                      parts: [{ text: choice.delta.content }],
+                    },
+                  },
+                ],
+              } as unknown as GenerateContentResponse;
+            }
 
-              yield {
-                candidates: [
-                  {
-                    content: { role: 'model', parts },
-                    ...(finishReason && { finishReason }),
-                  },
-                ],
-              } as unknown as GenerateContentResponse;
-            } else if (
-              choice.finish_reason &&
-              accumulatedToolCalls.size === 0
-            ) {
-              // Final chunk with no content and no tool calls
-              yield {
-                candidates: [
-                  {
-                    content: { role: 'model', parts: [{ text: '' }] },
-                    finishReason: 'STOP',
-                  },
-                ],
-              } as unknown as GenerateContentResponse;
+            if (choice.finish_reason && accumulatedToolCalls.size === 0) {
+              // SEGA-CLI: Extract hidden tool calls from text
+              const extractedParts: Part[] = [];
+
+              // 1. Extract markdown code blocks (bash, sh, python)
+              const codeBlockRegex = /```(bash|sh|python)\n([\s\S]*?)```/g;
+              let match;
+              while ((match = codeBlockRegex.exec(lastTextContent)) !== null) {
+                const lang = match[1];
+                const code = match[2].trim();
+                if (lang === 'bash' || lang === 'sh') {
+                  extractedParts.push({
+                    functionCall: {
+                      name: 'shell_exec',
+                      args: { command: code },
+                    } as FunctionCall,
+                  });
+                } else if (lang === 'python') {
+                  extractedParts.push({
+                    functionCall: {
+                      name: 'shell_exec',
+                      args: { command: `python3 -c ${JSON.stringify(code)}` },
+                    } as FunctionCall,
+                  });
+                }
+              }
+
+              // 2. Extract raw JSON tool calls (e.g. {"name": "write_file", "arguments": {...}})
+              const jsonRegex =
+                /\{[\s\S]*?"name"\s*:\s*"([^"]+)"[\s\S]*?"arguments"\s*:\s*(\{[\s\S]*?\})[\s\S]*?\}/g;
+              let jsonMatch;
+              while ((jsonMatch = jsonRegex.exec(lastTextContent)) !== null) {
+                const name = jsonMatch[1];
+                try {
+                  const args = JSON.parse(jsonMatch[2]) as Record<
+                    string,
+                    unknown
+                  >;
+                  // Evitar duplicidade se a regex pegar algo estranho
+                  if (name && Object.keys(args).length > 0) {
+                    extractedParts.push({
+                      functionCall: { name, args } as FunctionCall,
+                    });
+                  }
+                } catch {
+                  // Ignora falhas de parse
+                }
+              }
+
+              // Se encontramos comandos ocultos, emitimos eles agora junto com o STOP
+              if (extractedParts.length > 0) {
+                yield {
+                  candidates: [
+                    {
+                      content: { role: 'model', parts: extractedParts },
+                      finishReason: 'STOP',
+                    },
+                  ],
+                } as unknown as GenerateContentResponse;
+                hasEmittedToolCalls = true; // prevent [DONE] block from firing
+              } else {
+                // Comportamento normal sem comandos ocultos
+                yield {
+                  candidates: [
+                    {
+                      content: { role: 'model', parts: [{ text: '' }] },
+                      finishReason: 'STOP',
+                    },
+                  ],
+                } as unknown as GenerateContentResponse;
+              }
             }
           }
         }
