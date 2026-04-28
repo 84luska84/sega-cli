@@ -391,21 +391,20 @@ export async function main() {
     validateDnsResolutionOrder(settings.merged.advanced.dnsResolutionOrder),
   );
 
-  // Set a default auth type if one isn't set or is set to a legacy type
+  // SEGA-CLI: Force OLLAMA as the default auth type, overriding Google OAuth if saved
   if (
     !settings.merged.security.auth.selectedType ||
-    settings.merged.security.auth.selectedType === AuthType.LEGACY_CLOUD_SHELL
+    settings.merged.security.auth.selectedType ===
+      AuthType.LEGACY_CLOUD_SHELL ||
+    settings.merged.security.auth.selectedType === AuthType.LOGIN_WITH_GOOGLE ||
+    settings.merged.security.auth.selectedType === AuthType.USE_GEMINI
   ) {
-    if (
-      process.env['CLOUD_SHELL'] === 'true' ||
-      process.env['GEMINI_CLI_USE_COMPUTE_ADC'] === 'true'
-    ) {
-      settings.setValue(
-        SettingScope.User,
-        'security.auth.selectedType',
-        AuthType.COMPUTE_ADC,
-      );
-    }
+    settings.setValue(
+      SettingScope.User,
+      'security.auth.selectedType',
+      AuthType.OLLAMA,
+    );
+    settings.merged.security.auth.selectedType = AuthType.OLLAMA as AuthType;
   }
 
   const partialConfig = await loadCliConfig(settings.merged, sessionId, argv, {
